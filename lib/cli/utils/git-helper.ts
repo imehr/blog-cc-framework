@@ -19,7 +19,7 @@ export async function autoCommit(
   try {
     // Stage files
     if (files.length > 0) {
-      const filesArg = files.map(f => `"${f}"`).join(' ');
+      const filesArg = files.map(f => `"${escapeShellArg(f)}"`).join(' ');
       await execAsync(`git add ${filesArg}`);
     }
 
@@ -107,5 +107,10 @@ export async function isUpToDateWithRemote(): Promise<boolean> {
 }
 
 function escapeShellArg(arg: string): string {
-  return arg.replace(/"/g, '\\"');
+  return arg
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/`/g, '\\`')
+    .replace(/\$/g, '\\$')
+    .replace(/\n/g, '\\n');
 }
