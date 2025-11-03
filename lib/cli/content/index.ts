@@ -1,2 +1,2 @@
-// Content management utilities - coming soon
+export * from './add-video.js';
 export * from './ai-generator.js';
