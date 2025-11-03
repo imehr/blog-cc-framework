@@ -30,6 +30,30 @@ This reference documents all slash commands and agents available in the blog-cc-
 claude plugin install imehr/blog-cc-framework
 ```
 
+### Command Naming
+
+All commands are available in two forms:
+
+**Short form** (recommended):
+```bash
+/blog-init
+/blog-add-video
+/blog-validate
+/blog-deploy
+/blog-theme
+```
+
+**Namespaced form** (for disambiguation):
+```bash
+/blog-cc-framework:blog-init
+/blog-cc-framework:blog-add-video
+/blog-cc-framework:blog-validate
+/blog-cc-framework:blog-deploy
+/blog-cc-framework:blog-theme
+```
+
+Both forms work identically. Claude Code's autocomplete may show the namespaced form, but you can use the shorter version.
+
 ### Initialize New Site
 
 ```bash
