@@ -21,6 +21,12 @@ export interface GeneratedContent {
  */
 export async function extractYouTubeMetadata(url: string): Promise<VideoMetadata | null> {
   try {
+    // Validate YouTube URL
+    if (!url.match(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//)) {
+      console.error('Invalid YouTube URL');
+      return null;
+    }
+
     const response = await fetch(url);
     const html = await response.text();
     const $ = cheerio.load(html);
@@ -35,12 +41,12 @@ export async function extractYouTubeMetadata(url: string): Promise<VideoMetadata
                    $('meta[name="author"]').attr('content') || '';
 
     // Extract duration (if available in schema)
-    const durationMatch = html.match(/"duration":"PT(\d+H)?(\d+M)?(\d+S)?"/);
+    const durationMatch = html.match(/"duration":"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?"/);
     let duration: string | undefined;
     if (durationMatch) {
-      const hours = durationMatch[1] ? parseInt(durationMatch[1]) : 0;
-      const minutes = durationMatch[2] ? parseInt(durationMatch[2]) : 0;
-      const seconds = durationMatch[3] ? parseInt(durationMatch[3]) : 0;
+      const hours = durationMatch[1] ? parseInt(durationMatch[1], 10) : 0;
+      const minutes = durationMatch[2] ? parseInt(durationMatch[2], 10) : 0;
+      const seconds = durationMatch[3] ? parseInt(durationMatch[3], 10) : 0;
       if (hours > 0) {
         duration = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       } else {
