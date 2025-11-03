@@ -3,7 +3,7 @@ import * as path from 'path';
 import prompts from 'prompts';
 import chalk from 'chalk';
 import { generateMarkdownWithFrontmatter } from '../utils/yaml-handler.js';
-import { extractYouTubeMetadata, generateContentWithAI, extractYouTubeId } from './ai-generator.js';
+import { extractYouTubeMetadata, generateContentWithAI } from './ai-generator.js';
 import { autoCommit } from '../utils/git-helper.js';
 import { loadBlogCCConfig } from '../utils/config-loader.js';
 
@@ -50,7 +50,7 @@ export async function addVideo(
     const metadata = await extractYouTubeMetadata(options.url);
     if (!metadata) {
       console.error(chalk.red('❌ Failed to extract metadata from URL'));
-      process.exit(1);
+      throw new Error('Failed to extract metadata from URL');
     }
 
     console.log(chalk.green('✓ Metadata extracted:'));
@@ -76,7 +76,7 @@ export async function addVideo(
 
     if (!confirm) {
       console.log(chalk.yellow('Operation cancelled'));
-      process.exit(0);
+      return;
     }
 
     videoData = {
@@ -156,7 +156,7 @@ export async function addVideo(
 
     if (!responses.url) {
       console.log(chalk.yellow('Operation cancelled'));
-      process.exit(0);
+      return;
     }
 
     videoData = {
