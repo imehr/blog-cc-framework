@@ -1,2 +1,1 @@
-// Validation utilities - coming soon
-export {};
+export * from './content-validator.js';
