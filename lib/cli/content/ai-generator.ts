@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import { execSync } from 'child_process';
 
 export interface VideoMetadata {
   title: string;
@@ -17,16 +18,35 @@ export interface GeneratedContent {
 }
 
 /**
- * Extract metadata from YouTube URL using OpenGraph
+ * Extract metadata from YouTube using oEmbed API (primary method)
  */
-export async function extractYouTubeMetadata(url: string): Promise<VideoMetadata | null> {
+async function extractViaOEmbed(url: string): Promise<Partial<VideoMetadata> | null> {
   try {
-    // Validate YouTube URL
-    if (!url.match(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//)) {
-      console.error('Invalid YouTube URL');
+    const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+    const response = await fetch(oembedUrl);
+
+    if (!response.ok) {
       return null;
     }
 
+    const data: any = await response.json();
+
+    return {
+      title: data.title || '',
+      author: data.author_name || '',
+      thumbnailUrl: data.thumbnail_url || '',
+    };
+  } catch (error) {
+    console.error('oEmbed extraction failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract metadata from YouTube URL using direct page scraping (fallback)
+ */
+async function extractViaPageScraping(url: string): Promise<VideoMetadata | null> {
+  try {
     const response = await fetch(url);
     const html = await response.text();
     const $ = cheerio.load(html);
@@ -61,6 +81,85 @@ export async function extractYouTubeMetadata(url: string): Promise<VideoMetadata
       description,
       thumbnailUrl
     };
+  } catch (error) {
+    console.error('Page scraping failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract duration using Chrome MCP (requires browser)
+ */
+async function extractDurationViaChromeMCP(url: string): Promise<string | null> {
+  try {
+    console.log('ℹ Attempting to extract duration via Chrome MCP...');
+
+    // This is a placeholder - actual implementation would use MCP tool
+    // For now, we'll document that duration extraction via Chrome requires:
+    // 1. Navigate to video page
+    // 2. Wait for player to load
+    // 3. Extract duration from player UI or metadata
+
+    // In practice, the slash command agent would handle this using:
+    // mcp__plugin_superpowers-chrome_chrome__use_browser tool
+
+    return null; // Return null for now, agent will handle it
+  } catch (error) {
+    console.error('Chrome MCP duration extraction failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract metadata from YouTube URL using three-tier fallback strategy:
+ * 1. oEmbed API (fast, reliable, official)
+ * 2. Direct page scraping (if oEmbed fails)
+ * 3. Chrome MCP (for duration if needed)
+ */
+export async function extractYouTubeMetadata(url: string): Promise<VideoMetadata | null> {
+  try {
+    // Validate YouTube URL
+    if (!url.match(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//)) {
+      console.error('Invalid YouTube URL');
+      return null;
+    }
+
+    console.log('🤖 Extracting metadata from URL...');
+
+    // Method 1: Try oEmbed API first (best method)
+    console.log('ℹ Trying oEmbed API...');
+    const oembedData = await extractViaOEmbed(url);
+
+    if (oembedData && oembedData.title && oembedData.author) {
+      console.log('✓ Metadata extracted via oEmbed API');
+
+      // oEmbed doesn't provide duration, try to get it from page scraping
+      const pageData = await extractViaPageScraping(url);
+
+      return {
+        title: oembedData.title,
+        author: oembedData.author,
+        duration: pageData?.duration,
+        description: pageData?.description,
+        thumbnailUrl: oembedData.thumbnailUrl,
+      };
+    }
+
+    // Method 2: Fallback to page scraping
+    console.log('⚠ oEmbed failed, trying page scraping...');
+    const pageData = await extractViaPageScraping(url);
+
+    if (pageData && pageData.title) {
+      console.log('✓ Metadata extracted via page scraping');
+      return pageData;
+    }
+
+    // Method 3: Final fallback - Chrome MCP (handled by agent)
+    console.log('⚠ Page scraping failed');
+    console.log('ℹ Chrome MCP fallback available via agent');
+    console.log('ℹ Agent will use: mcp__plugin_superpowers-chrome_chrome__use_browser');
+
+    return null;
   } catch (error) {
     console.error('Failed to extract YouTube metadata:', error);
     return null;

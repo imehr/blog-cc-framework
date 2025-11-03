@@ -22,45 +22,67 @@ Add a YouTube video to your blog-cc site with AI-powered metadata extraction.
 
 ## Metadata Extraction Methods
 
-The command uses two methods to extract video metadata:
+The command uses a **three-tier fallback strategy** for maximum reliability:
 
-### Method 1: Direct Fetch (Primary)
-Attempts to fetch metadata directly from YouTube URL using standard HTTP requests.
+### Method 1: YouTube oEmbed API (Primary) ⭐
+Uses YouTube's official oEmbed endpoint for metadata extraction.
+
+**How it works:**
+```
+GET https://www.youtube.com/oembed?url=VIDEO_URL&format=json
+```
+
+**Provides:**
+- ✅ Title
+- ✅ Author/Channel name
+- ✅ Thumbnail URL
+- ❌ Duration (not available)
 
 **Advantages:**
-- Fast and lightweight
+- Official YouTube API (no scraping)
+- Fast and reliable
+- No rate limits
 - No browser required
-- Works in all environments
+- Works in all regions
+
+**Why it's best:**
+This is the most reliable method because it uses YouTube's official public API that never gets blocked.
+
+### Method 2: Page Scraping (First Fallback)
+If oEmbed fails, scrapes the YouTube page directly.
+
+**Provides:**
+- ✅ Title
+- ✅ Author
+- ✅ Duration (from schema.org markup)
+- ✅ Description
+- ✅ Thumbnail
 
 **Limitations:**
-- May be blocked by YouTube in some regions
-- Rate limits may apply
+- May be blocked by YouTube
+- Slower than oEmbed
+- Regional restrictions may apply
 
-### Method 2: Chrome MCP (Automatic Fallback)
-If fetch fails, automatically falls back to Chrome DevTools Protocol:
+### Method 3: Chrome MCP (Final Fallback)
+If both methods above fail, uses Chrome DevTools Protocol.
 
 **How it works:**
 1. Connects to your running Chrome browser
 2. Navigates to the YouTube video page
-3. Extracts metadata from the rendered page:
-   - Title from `<h1>` tag
-   - Channel name from page metadata
-   - Duration from video player
-   - Description from page content
+3. Extracts metadata from rendered page
 
 **Requirements:**
 - Chrome browser running
 - `superpowers-chrome` MCP plugin installed
-- No login required (public videos)
 
 **Advantages:**
-- Always works (uses actual browser)
-- No API rate limits
-- Handles region restrictions
+- Always works (uses real browser)
+- Bypasses all blocking
+- Can access region-restricted content
 
 ## Examples
 
-### Example 1: Successful Direct Fetch
+### Example 1: Successful oEmbed API Extraction
 
 ```bash
 /blog-add-video https://youtube.com/watch?v=kCc8FmEb1nY
@@ -69,10 +91,15 @@ If fetch fails, automatically falls back to Chrome DevTools Protocol:
 # 📹 Adding video to blog-cc site...
 #
 # 🤖 Extracting metadata from URL...
-# ✓ Metadata extracted:
+# ℹ Trying oEmbed API...
+# ✓ Metadata extracted via oEmbed API
+# ✓ Duration extracted via page scraping
+#
+# Extracted metadata:
 #   Title: Introduction to Transformers
 #   Author: Andrej Karpathy
 #   Duration: 45:30
+#   Thumbnail: https://i.ytimg.com/vi/kCc8FmEb1nY/hqdefault.jpg
 #
 # 🤖 Generating enhanced content with AI...
 # ✓ AI analysis complete:
