@@ -1,6 +1,6 @@
 {
   "name": "blog-cc-framework",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Claude Code plugin for blog-cc content management with AI generation and deployment",
   "author": "Mehran Mozaffari <mehran.mozaffari@gmail.com>",
   "license": "MIT",

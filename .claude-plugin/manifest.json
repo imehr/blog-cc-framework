@@ -1,6 +1,6 @@
 {
   "name": "blog-cc-framework",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "Blog-CC Framework",
   "description": "Slash commands and agents for blog-cc static sites with AI generation, Twitter bookmarks sync, and deployment automation",
   "author": "Mehran Mozaffari <mehran.mozaffari@gmail.com>",
@@ -16,7 +16,7 @@
       "category": "content-management",
       "path": "skills/content-management/blog-cc",
       "description": "Manage blog-cc sites: content, courses, deployment, themes, Twitter bookmarks with AI generation",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "tested": false,
       "verification_safeguards": true,
       "word_count": 1107

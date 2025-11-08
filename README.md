@@ -2,7 +2,7 @@
 
 **Slash commands and agents for managing blog-cc static sites with AI-powered content generation and GitHub Pages deployment.**
 
-Version: 1.0.3
+Version: 1.1.1
 
 ---
 
