@@ -482,7 +482,27 @@ The framework provides battle-tested utilities (all with TDD tests passing):
 
 ## Version History
 
-### v1.0.3 (Current)
+### v1.2.0 (In Development) - Template Sync System
+- 🚧 **NEW**: `/blog-sync-template` command (in progress)
+  - Git Remote Strategy with commit-by-commit review
+  - Interactive conflict resolution
+  - Pre/post sync validation with rollback
+  - See: [Design Doc](./docs/plans/2025-11-08-template-sync-design.md)
+  - See: [Implementation Plan](./docs/plans/2025-11-08-blog-sync-template-implementation.md)
+- ✓ Completed: git-operations module
+- ⏳ Remaining: validator, conflict resolver, orchestrator modules
+
+### v1.1.1
+- ✓ Added YouTube oEmbed API extraction (primary method)
+- ✓ Three-tier fallback (oEmbed → Page scraping → Chrome MCP)
+- ✓ Updated documentation
+
+### v1.1.0
+- ✓ Added Twitter bookmarks sync (`/blog-sync-bookmarks`)
+- ✓ Added bookmarks archival (`/blog-archive-tweets`)
+- ✓ Chrome MCP integration
+
+### v1.0.3
 - ✓ Clarified command naming (short vs. namespaced forms)
 - ✓ Updated documentation
 
